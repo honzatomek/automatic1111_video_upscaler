@@ -1,10 +1,10 @@
-# Video Resizer
+# Video Upscaler
 
-Video Resizer is a Python package that allows you to resize videos using the Automatic1111 web UI. It provides a convenient way to upscale video resolution while maintaining the original framerate and audio.
+Video Upscaler is a Python package that allows you to upscale videos using the Automatic1111 web UI. It provides a convenient way to upscale video resolution while maintaining the original framerate and audio.
 
 ## Features
 
-- Resize videos to a specified width and height
+- Upscale videos to a specified width and height
 - Maintain the original framerate of the video
 - Preserve the audio from the original video
 - Utilize the Automatic1111 web UI for high-quality upscaling
@@ -27,51 +27,51 @@ Video Resizer is a Python package that allows you to resize videos using the Aut
      python launch.py --api
      ```
 
-3. Install the Video Resizer package using pip:
+3. Install the Video Upscaler package using pip:
    ```
-   pip install video-resizer
+   pip install video-upscaler
    ```
 
 ## Usage
 
-1. Import the `VideoResizer` class from the package:
+1. Import the `VideoUpscaler` class from the package:
    ```python
-   from video_resizer import VideoResizer
+   from video_upscaler import VideoUpscaler
    ```
 
-2. Create an instance of the `VideoResizer` class:
+2. Create an instance of the `VideoUpscaler` class:
    ```python
-   resizer = VideoResizer(host='localhost', port=7860)
+   upscaler = VideoUpscaler(host='localhost', port=7860)
    ```
    - `host`: The hostname or IP address where the Automatic1111 web UI is running (default: `'localhost'`).
    - `port`: The port number on which the Automatic1111 web UI is running (default: `7860`).
 
-3. Use the `resize_video` method to resize a video:
+3. Use the `upscale_video` method to upscale a video:
    ```python
-   resizer.resize_video(input_video, output_video, output_width, output_height)
+   upscaler.upscale_video(input_video, output_video, output_width, output_height)
    ```
    - `input_video`: The path to the input video file.
-   - `output_video`: The path where the resized video will be saved.
-   - `output_width`: The desired width of the resized video.
-   - `output_height`: The desired height of the resized video.
+   - `output_video`: The path where the upscaled video will be saved.
+   - `output_width`: The desired width of the upscaled video.
+   - `output_height`: The desired height of the upscaled video.
 
    Example:
    ```python
-   resizer.resize_video("input_video.mp4", "output_video.mp4", 1920, 1080)
+   upscaler.upscale_video("input_video.mp4", "output_video.mp4", 1920, 1080)
    ```
 
-4. The resized video will be saved to the specified output path.
+4. The upscaled video will be saved to the specified output path.
 
 ## Example
 
 ```python
-from video_resizer import VideoResizer
+from video_upscaler import VideoUpscaler
 
-# Create an instance of VideoResizer
-resizer = VideoResizer(host='localhost', port=7860)
+# Create an instance of VideoUpscaler
+upscaler = VideoUpscaler(host='localhost', port=7860)
 
-# Resize a video
-resizer.resize_video("input_video.mp4", "output_video.mp4", 1920, 1080)
+# Upscale a video
+upscaler.upscale_video("input_video.mp4", "output_video.mp4", 1920, 1080)
 ```
 
 ## Contributing

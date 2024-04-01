@@ -3,7 +3,7 @@ import ffmpeg
 from PIL import Image
 import webuiapi
 
-class VideoResizer:
+class VideoUpscaler:
     def __init__(self, host='localhost', port=7860):
         self.api = webuiapi.WebUIApi(host=host, port=port)
 
@@ -47,12 +47,12 @@ class VideoResizer:
             image.save(output_frames[i])
 
     def stitch_video(self, temp_dir, output_video, framerate, audio_stream):
-        resized_video_stream = ffmpeg.input(f"{temp_dir}/resized_frame%04d.jpg", pattern_type='sequence', framerate=framerate)
+        upscaled_video_stream = ffmpeg.input(f"{temp_dir}/upscaled_frame%04d.jpg", pattern_type='sequence', framerate=framerate)
 
         try:
             (
                 ffmpeg
-                .output(audio_stream, resized_video_stream, output_video, vcodec='mpeg4', acodec='aac')
+                .output(audio_stream, upscaled_video_stream, output_video, vcodec='mpeg4', acodec='aac')
                 .global_args('-y')  # Overwrite output files without asking
                 .run(capture_stdout=True, capture_stderr=True)
             )
@@ -67,7 +67,7 @@ class VideoResizer:
         os.rmdir(temp_dir)
         
 
-    def resize_video(self, input_video, output_video, output_width, output_height):
+    def upscale_video(self, input_video, output_video, output_width, output_height):
         framerate = self.get_framerate(input_video)
 
         # Create a temporary directory to store the extracted frames
@@ -86,7 +86,7 @@ class VideoResizer:
 
         # Prepare input and output frame paths
         input_frames = [f"{temp_dir}/frame{i:04d}.jpg" for i in range(1, num_frames + 1)]
-        output_frames = [f"{temp_dir}/resized_frame{i:04d}.jpg" for i in range(1, num_frames + 1)]
+        output_frames = [f"{temp_dir}/upscaled_frame{i:04d}.jpg" for i in range(1, num_frames + 1)]
 
         # Perform batch upscaling
         self.upscale_img_batch(input_frames, output_frames, output_width, output_height)
@@ -94,7 +94,7 @@ class VideoResizer:
         # Extract audio from the original video
         audio_stream = ffmpeg.input(input_video).audio
 
-        # Stitch the resized frames back into a video
+        # Stitch the upscaled frames back into a video
         self.stitch_video(temp_dir, output_video, framerate, audio_stream)
 
         # Clean up temporary files and directory

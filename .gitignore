@@ -5,6 +5,9 @@
 *.mp4
 *.webm
 __pycache__
-video_resizer/__pycache__
-video_resizer.egg-info/
+video_upscaler/__pycache__
+video_upscaler.egg-info/
+video_resizer.egg-info
+temp_frames/
+dist/
 build/
