@@ -1,6 +1,6 @@
-# Video Upscaler
+# Stable Diffusion Video Upscaler
 
-Video Upscaler is a Python package that allows you to upscale videos using the Automatic1111 web UI. It provides a convenient way to upscale video resolution while maintaining the original framerate and audio.
+Stable Diffusion Video Upscaler is a Python package that allows you to upscale videos using the Automatic1111 web UI. It provides a convenient way to upscale video resolution while maintaining the original framerate and audio.
 
 ## Features
 
@@ -62,6 +62,8 @@ Video Upscaler is a Python package that allows you to upscale videos using the A
 
 4. The upscaled video will be saved to the specified output path.
 
+5. This will take some time depending on the machine Running Automatic111 along with the length and framerate of your input video
+
 ## Example
 
 ```python
@@ -86,7 +88,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - [Automatic1111 web UI](https://github.com/AUTOMATIC1111/stable-diffusion-webui) for providing the upscaling functionality.
 - [FFmpeg](https://ffmpeg.org/) for video processing capabilities.
-
-## Contact
-
-For any questions or inquiries, please contact [your-email@example.com](mailto:your-email@example.com).
