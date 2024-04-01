@@ -1,0 +1,7 @@
+*.png
+*.jpg
+*.jpeg
+*.aac
+*.mp4
+*.webm
+__pycache__
