@@ -1,11 +1,14 @@
 import os
+import math
 import ffmpeg
 from PIL import Image
 import webuiapi
 
+
 class VideoUpscaler:
     def __init__(self, host='localhost', port=7860):
         self.api = webuiapi.WebUIApi(host=host, port=port)
+
 
     def get_framerate(self, input_video):
         try:
@@ -16,6 +19,7 @@ class VideoUpscaler:
         except ffmpeg.Error as e:
             print(f"FFmpeg error: {e.stderr.decode('utf-8')}")
             return False
+
 
     def extract_frames(self, input_video, temp_dir):
         try:
@@ -31,20 +35,55 @@ class VideoUpscaler:
             return False
         return True
 
-    def upscale_img_batch(self, input_frames, output_frames, width, height):
-        print(f"Performing image Upscale")
+
+    def upscale_img_batch(self, input_frames, output_frames, width, height, batch_limit=100):
+        print(f"Performing image frames Upscale in batches")
+
+        if batch_limit is None:
+            batch_limit = len(input_frames)
+
+        # Split all images into batches
+        cnt, cntall = 0, math.ceil(len(input_frames) / batch_limit)
+        for i in range(0, len(input_frames), batch_limit):
+            cnt += 1
+            print(f"Processing frame batch {cnt:d}/{cntall:d}")
+            input_batch = input_frames[i:i+batch_limit]
+            output_batch = output_frames[i:i+batch_limit]
+
+            # Open the input frames as PIL images
+            pil_images = [Image.open(frame) for frame in input_batch]
+
+            # Perform batch upscaling
+            result = self.api.extra_batch_images(images=pil_images,
+                                                 upscaler_1=webuiapi.Upscaler.ESRGAN_4x,
+                                                 upscaling_resize_w=width, upscaling_resize_h=height)
+
+            # Save the upscaled images
+            for j, image in enumerate(result.images):
+                image.save(output_batch[j])
+
+            # close the images
+            [frame.close() for frame in pil_images]
+
+            # close the images
+            [frame.close() for frame in result.images]
+
+
+    def upscale_img_sequential(self, input_frames, output_frames, width, height):
+        print(f"Performing sequential image Upscale")
 
         # Open the input frames as PIL images
-        pil_images = [Image.open(frame) for frame in input_frames]
+        for i, (input_frame, output_frame) in enumerate(zip(input_frames, output_frames)):
+            print(f"Processing frame {i+1:d}/{len(input_frames):d}")
+            with Image.open(input_frame) as pil_image:
+                # Perform upscaling
+                result = self.api.extra_single_image(image=pil_image,
+                                                     upscaler_1=webuiapi.Upscaler.ESRGAN_4x,
+                                                     upscaling_resize_w=width, upscaling_resize_h=height)
 
-        # Perform batch upscaling
-        result = self.api.extra_batch_images(images=pil_images,
-                                             upscaler_1=webuiapi.Upscaler.ESRGAN_4x,
-                                             upscaling_resize_w=width, upscaling_resize_h=height)
+                # Save the upscaled image
+                result.image.save(output_frame)
 
-        # Save the upscaled images
-        for i, image in enumerate(result.images):
-            image.save(output_frames[i])
 
     def stitch_video(self, temp_dir, output_video, framerate, audio_stream):
         upscaled_video_stream = ffmpeg.input(f"{temp_dir}/upscaled_frame%04d.jpg", pattern_type='sequence', framerate=framerate)
@@ -61,13 +100,14 @@ class VideoUpscaler:
         except Exception as e:
             print(f"General Exception: {e}")
 
+
     def cleanup_files(self, temp_dir):
         for file in os.listdir(temp_dir):
             os.remove(os.path.join(temp_dir, file))
         os.rmdir(temp_dir)
-        
 
-    def upscale_video(self, input_video, output_video, output_width, output_height):
+
+    def upscale_video(self, input_video, output_video, output_width, output_height, batch_limit=100):
         framerate = self.get_framerate(input_video)
 
         # Create a temporary directory to store the extracted frames
@@ -89,7 +129,10 @@ class VideoUpscaler:
         output_frames = [f"{temp_dir}/upscaled_frame{i:04d}.jpg" for i in range(1, num_frames + 1)]
 
         # Perform batch upscaling
-        self.upscale_img_batch(input_frames, output_frames, output_width, output_height)
+        try:
+            self.upscale_img_batch(input_frames, output_frames, output_width, output_height, batch_limit)
+        except OSError as e:
+            self.upscale_img_sequential(input_frames, output_frames, output_width, output_height)
 
         # Extract audio from the original video
         audio_stream = ffmpeg.input(input_video).audio
@@ -99,3 +142,5 @@ class VideoUpscaler:
 
         # Clean up temporary files and directory
         self.cleanup_files(temp_dir)
+
+
