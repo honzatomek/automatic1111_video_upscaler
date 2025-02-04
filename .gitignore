@@ -4,6 +4,7 @@
 *.aac
 *.mp4
 *.webm
+__venv__/
 __pycache__
 video_upscaler/__pycache__
 video_upscaler.egg-info/
